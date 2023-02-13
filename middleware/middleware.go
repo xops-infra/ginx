@@ -8,7 +8,7 @@ type Middleware struct {
 	ginEngine *gin.Engine
 }
 
-func New(ginEngine *gin.Engine) *Middleware {
+func AttachTo(ginEngine *gin.Engine) *Middleware {
 	return &Middleware{
 		ginEngine: ginEngine,
 	}
@@ -32,15 +32,15 @@ func (m *Middleware) WithCORS() *Middleware {
 	return m
 }
 
-// WithRequestID is a middleware function that sets a request ID
-func (m *Middleware) WithRequestID(key string) *Middleware {
-	m.ginEngine.Use(RequestID(key))
-	return m
-}
-
 // WithRecover is a middleware function that recovers from any panics and writes a 500 if there was one
 func (m *Middleware) WithRecover() *Middleware {
 	m.ginEngine.Use(Recover())
+	return m
+}
+
+// WithRequestID is a middleware function that sets a request ID
+func (m *Middleware) WithRequestID(key string) *Middleware {
+	m.ginEngine.Use(RequestID(key))
 	return m
 }
 
