@@ -1,4 +1,4 @@
-# Golang gin extension
+# golang gin eXtension
 
 Depends on https://github.com/gin-gonic/gin
 
