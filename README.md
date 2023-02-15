@@ -9,7 +9,7 @@ Depends on https://github.com/gin-gonic/gin
 
 ## Install
 
-`go get -u github.com/sfpprxy/ginx`
+`go get -u github.com/patsnapops/ginx`
 
 ## Example
 
@@ -18,8 +18,8 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/sfpprxy/ginx/middleware"
-	"github.com/sfpprxy/http-headers"
+	"github.com/patsnapops/ginx/middleware"
+	"github.com/patsnapops/http-headers"
 )
 
 func main() {

@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/sfpprxy/http-headers"
+	"github.com/patsnapops/http-headers"
 )
 
 // Secure is a middleware function that appends security and resource access headers

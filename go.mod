@@ -1,4 +1,4 @@
-module github.com/sfpprxy/ginx
+module github.com/patsnapops/ginx
 
 go 1.19
 
@@ -7,7 +7,7 @@ require (
 	github.com/gin-contrib/gzip v0.0.6
 	github.com/gin-gonic/gin v1.8.2
 	github.com/google/uuid v1.3.0
-	github.com/sfpprxy/http-headers v0.0.0-20230213015059-6e86f9c736dd
+	github.com/patsnapops/http-headers v0.0.0-20230213015059-6e86f9c736dd
 )
 
 require (
