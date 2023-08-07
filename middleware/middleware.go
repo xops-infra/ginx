@@ -2,6 +2,8 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/rcrowley/go-metrics"
+	influxdb "github.com/vrischmann/go-metrics-influxdb"
 )
 
 type Middleware struct {
@@ -47,5 +49,20 @@ func (m *Middleware) WithRequestID(key string) *Middleware {
 // WithSecurity is a middleware function that enhance security
 func (m *Middleware) WithSecurity() *Middleware {
 	m.ginEngine.Use(Secure())
+	return m
+}
+
+// WithMetrics is a middleware function that enables metrics
+func (m *Middleware) WithMetrics(config *MetricInfluxConfig) *Middleware {
+	go influxdb.InfluxDB(metrics.DefaultRegistry,
+		10e9, // 1 seconds
+		config.Host,
+		config.Database,
+		config.Measurement,
+		config.Username,
+		config.Password,
+		true, // enable aligned timestamps
+	)
+	m.ginEngine.Use(Metrics())
 	return m
 }

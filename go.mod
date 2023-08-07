@@ -7,6 +7,8 @@ require (
 	github.com/gin-gonic/gin v1.8.2
 	github.com/google/uuid v1.3.0
 	github.com/patsnapops/http-headers v0.0.0-20230213021202-2b827f3526a0
+	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475
+	github.com/vrischmann/go-metrics-influxdb v0.1.1
 )
 
 require (
@@ -15,6 +17,7 @@ require (
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.11.2 // indirect
 	github.com/goccy/go-json v0.10.0 // indirect
+	github.com/influxdata/influxdb1-client v0.0.0-20191209144304-8bf82d3c094d // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
