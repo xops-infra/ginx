@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -32,39 +33,16 @@ type PathMetrics struct {
 
 // Metrics is a middleware function that enables metrics
 func Metrics() gin.HandlerFunc {
-	// 创建一个 PathMetrics 结构体来存储不同路径的计数器和计时器
-	pathMetrics := &PathMetrics{
-		Counters: make(map[string]metrics.Counter),
-		Timers:   make(map[string]metrics.Timer),
-	}
-
 	return func(c *gin.Context) {
-		// 获取当前请求的路径
-		path := c.Request.URL.Path
-
-		// 检查是否已经存在该路径的计数器和计时器，如果不存在则创建新的
-		_, ok := pathMetrics.Counters[path]
-		if !ok {
-			pathMetrics.Counters[path] = metrics.NewCounter()
-			metrics.Register(path+"_counter", pathMetrics.Counters[path])
-		}
-		_, ok = pathMetrics.Timers[path]
-		if !ok {
-			pathMetrics.Timers[path] = metrics.NewTimer()
-			metrics.Register(path+"_timer", pathMetrics.Timers[path])
-		}
-
-		// 计数器加一
-		pathMetrics.Counters[path].Inc(1)
-
-		// 计时器开始计时
 		start := time.Now()
-
-		// 继续处理请求
 		c.Next()
 
-		// 计时器停止并记录经过的时间
-		elapsed := time.Since(start)
-		pathMetrics.Timers[path].Update(elapsed)
+		// 记录API请求的处理时间
+		duration := time.Since(start)
+		metrics.GetOrRegisterTimer("api.latency", nil).Update(duration)
+
+		// 记录API请求的状态码
+		statusCode := c.Writer.Status()
+		metrics.GetOrRegisterCounter("api.status."+strconv.Itoa(statusCode), nil).Inc(1)
 	}
 }
