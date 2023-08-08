@@ -1,13 +1,8 @@
 package middleware
 
 import (
-	"log"
-	"os"
-	"time"
-
 	"github.com/gin-gonic/gin"
-	"github.com/rcrowley/go-metrics"
-	influxdb "github.com/vrischmann/go-metrics-influxdb"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 type Middleware struct {
@@ -58,16 +53,9 @@ func (m *Middleware) WithSecurity() *Middleware {
 
 // WithMetrics is a middleware function that enables metrics
 func (m *Middleware) WithMetrics(config *MetricInfluxConfig) *Middleware {
-	go influxdb.InfluxDB(metrics.DefaultRegistry,
-		5*time.Second, // 1 seconds
-		config.Host,
-		config.Database,
-		config.Measurement,
-		config.Username,
-		config.Password,
-		true, // enable aligned timestamps
-	)
-	go metrics.Log(metrics.DefaultRegistry, 5*time.Second, log.New(os.Stderr, "metrics: ", log.Lmicroseconds))
+	// promhttp.Handler()
+	// add http handler to gin
+	m.ginEngine.GET("/metrics", gin.WrapH(promhttp.Handler()))
 	m.ginEngine.Use(Metrics())
 	return m
 }
