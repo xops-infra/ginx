@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"strconv"
+	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -26,12 +26,11 @@ func NewMetricInfluxConfig(host string, database string, measurement string, use
 	}
 }
 
-type PathMetrics struct {
-	Counters map[string]metrics.Counter
-	Timers   map[string]metrics.Timer
-}
+var (
+	statusCodeMetrics = make(map[int]metrics.Counter)
+	lock              sync.Mutex
+)
 
-// Metrics is a middleware function that enables metrics
 func Metrics() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		start := time.Now()
@@ -43,6 +42,20 @@ func Metrics() gin.HandlerFunc {
 
 		// 记录API请求的状态码
 		statusCode := c.Writer.Status()
-		metrics.GetOrRegisterCounter("api.status."+strconv.Itoa(statusCode), nil).Inc(1)
+		registerStatusCodeMetric(statusCode).Inc(1)
 	}
+}
+
+func registerStatusCodeMetric(code int) metrics.Counter {
+	lock.Lock()
+	defer lock.Unlock()
+
+	metric, ok := statusCodeMetrics[code]
+	if !ok {
+		metric = metrics.NewCounter()
+		metrics.GetOrRegister("api.status", metric)
+		statusCodeMetrics[code] = metric
+	}
+
+	return metric
 }
