@@ -25,24 +25,6 @@ var (
 	})
 )
 
-type MetricInfluxConfig struct {
-	Host        string
-	Database    string
-	Measurement string
-	Username    string
-	Password    string
-}
-
-func NewMetricInfluxConfig(host string, database string, measurement string, username string, password string) *MetricInfluxConfig {
-	return &MetricInfluxConfig{
-		Host:        host, // 127.0.0.1:8086
-		Database:    database,
-		Measurement: measurement,
-		Username:    username,
-		Password:    password,
-	}
-}
-
 // Metrics is a middleware function that enables metrics
 func Metrics() gin.HandlerFunc {
 	return func(c *gin.Context) {

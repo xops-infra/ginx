@@ -52,7 +52,7 @@ func (m *Middleware) WithSecurity() *Middleware {
 }
 
 // WithMetrics is a middleware function that enables metrics
-func (m *Middleware) WithMetrics(config *MetricInfluxConfig) *Middleware {
+func (m *Middleware) WithMetrics() *Middleware {
 	// promhttp.Handler()
 	// add http handler to gin
 	m.ginEngine.GET("/metrics", gin.WrapH(promhttp.Handler()))
