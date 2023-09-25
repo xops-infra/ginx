@@ -30,16 +30,13 @@ func TokenAuthMiddleware(ignorePaths []string, secret []byte) gin.HandlerFunc {
 			}
 		}
 
-		token, err := extractBearerToken(c.Request.Header)
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, err.Error())
-			return
-		}
+		token := extractBearerToken(c.Request.Header)
 		claims, err := parse(token, secret)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, err.Error())
 			return
 		}
+
 		// log.Debugf(tea.Prettify(claims))
 		err = checkIfExpired(claims)
 		if err != nil {
@@ -50,14 +47,11 @@ func TokenAuthMiddleware(ignorePaths []string, secret []byte) gin.HandlerFunc {
 	}
 }
 
-func extractBearerToken(header http.Header) (string, error) {
+func extractBearerToken(header http.Header) string {
 	const BearerSpace = "Bearer "
 	auth := header.Get(hh.Authorization)
 	token := strings.TrimPrefix(auth, BearerSpace)
-	if token == auth {
-		return "", errors.New("no bearer token found in Authorization header")
-	}
-	return token, nil
+	return token
 }
 
 func checkIfExpired(claims map[string]any) error {
