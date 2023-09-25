@@ -9,6 +9,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/patsnapops/http-headers v0.0.0-20230213021202-2b827f3526a0
 	github.com/prometheus/client_golang v1.16.0
+	github.com/spf13/cast v1.5.1
 )
 
 require (
@@ -31,8 +32,6 @@ require (
 	github.com/prometheus/common v0.42.0 // indirect
 	github.com/prometheus/procfs v0.10.1 // indirect
 	github.com/ugorji/go/codec v1.2.9 // indirect
-	github.com/valyala/fastrand v1.1.0 // indirect
-	github.com/valyala/histogram v1.2.0 // indirect
 	golang.org/x/crypto v0.6.0 // indirect
 	golang.org/x/net v0.7.0 // indirect
 	golang.org/x/sys v0.8.0 // indirect

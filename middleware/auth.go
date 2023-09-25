@@ -9,6 +9,8 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	hh "github.com/patsnapops/http-headers"
+	"github.com/spf13/cast"
 )
 
 // TokenAuthMiddleware is a middleware function that checks for a valid token in the Authorization header
@@ -28,43 +30,63 @@ func TokenAuthMiddleware(ignorePaths []string, secret []byte) gin.HandlerFunc {
 			}
 		}
 
-		// Check if the Authorization header is present
-		token := c.Request.Header.Get("Authorization")
-		if token == "" {
-			c.AbortWithStatusJSON(401, gin.H{"error": "Missing Authorization header"})
-			return
-		}
-
-		// Check if the token is valid
-		err := ValidateToken(token, secret)
+		token, err := extractBearerToken(c.Request.Header)
 		if err != nil {
-			c.AbortWithStatusJSON(401, gin.H{"error": "Invalid token"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, err.Error())
 			return
 		}
-
-		// Token is valid, continue
+		claims, err := parse(token, secret)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, err.Error())
+			return
+		}
+		// log.Debugf(tea.Prettify(claims))
+		err = checkIfExpired(claims)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, err.Error())
+			return
+		}
 		c.Next()
 	}
 }
 
-// ValidateToken
-func ValidateToken(signedToken string, secret []byte) error {
-	// Parse the signed JWT token and validate it
-	parsedToken, err := jwt.Parse(signedToken, func(token *jwt.Token) (interface{}, error) {
+func extractBearerToken(header http.Header) (string, error) {
+	const BearerSpace = "Bearer "
+	auth := header.Get(hh.Authorization)
+	token := strings.TrimPrefix(auth, BearerSpace)
+	if token == auth {
+		return "", errors.New("no bearer token found in Authorization header")
+	}
+	return token, nil
+}
+
+func checkIfExpired(claims map[string]any) error {
+	const Exp = "exp"
+	exp := claims[Exp]
+	if exp == nil {
+		return errors.New("exp not found")
+	}
+	expTimestamp, ok := exp.(float64)
+	if !ok {
+		return errors.New("exp is not a valid int64")
+	}
+	if time.Now().Unix() > cast.ToInt64(expTimestamp) {
+		return errors.New("token expired")
+	}
+	return nil
+}
+
+// parse use HMAC to decrypt the token
+func parse(token string, secret []byte) (map[string]any, error) {
+	parsedToken, err := jwt.Parse(token, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+			const Alg = "alg"
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header[Alg])
 		}
 		return secret, nil
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
-
-	// Check if the token is expired
-	if claims, ok := parsedToken.Claims.(jwt.MapClaims); ok && parsedToken.Valid {
-		if time.Now().Unix() > int64(claims["exp"].(float64)) {
-			return errors.New("token expired")
-		}
-	}
-	return nil
+	return parsedToken.Claims.(jwt.MapClaims), nil
 }
