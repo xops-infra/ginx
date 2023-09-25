@@ -59,3 +59,10 @@ func (m *Middleware) WithMetrics() *Middleware {
 	m.ginEngine.Use(Metrics())
 	return m
 }
+
+// WithAuth is a middleware function that checks for a valid token in the Authorization header
+// ignorePaths: paths that do not need to check token,prefix match
+func (m *Middleware) WithAuth(ignorePaths []string, secret []byte) *Middleware {
+	m.ginEngine.Use(TokenAuthMiddleware(ignorePaths, secret))
+	return m
+}

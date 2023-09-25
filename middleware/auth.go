@@ -3,6 +3,8 @@ package middleware
 import (
 	"errors"
 	"fmt"
+	"net/http"
+	"strings"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -10,12 +12,17 @@ import (
 )
 
 // TokenAuthMiddleware is a middleware function that checks for a valid token in the Authorization header
-func TokenAuthMiddleware(ignorePaths ...string) gin.HandlerFunc {
+func TokenAuthMiddleware(ignorePaths []string, secret []byte) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// let the request pass if request method is OPTIONS
+		if c.Request.Method == http.MethodOptions {
+			c.Next()
+			return
+		}
+
 		// Check if the current path is in the ignore list
 		for _, path := range ignorePaths {
-			// 正直表达式匹配更好
-			if path == c.Request.URL.Path {
+			if strings.HasPrefix(c.Request.URL.Path, path) {
 				c.Next()
 				return
 			}
@@ -29,7 +36,7 @@ func TokenAuthMiddleware(ignorePaths ...string) gin.HandlerFunc {
 		}
 
 		// Check if the token is valid
-		err := ValidateToken(token)
+		err := ValidateToken(token, secret)
 		if err != nil {
 			c.AbortWithStatusJSON(401, gin.H{"error": "Invalid token"})
 			return
@@ -41,9 +48,8 @@ func TokenAuthMiddleware(ignorePaths ...string) gin.HandlerFunc {
 }
 
 // ValidateToken
-func ValidateToken(signedToken string) error {
+func ValidateToken(signedToken string, secret []byte) error {
 	// Parse the signed JWT token and validate it
-	var secret = []byte("")
 	parsedToken, err := jwt.Parse(signedToken, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
