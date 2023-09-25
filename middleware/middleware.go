@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 type Middleware struct {
@@ -47,5 +48,14 @@ func (m *Middleware) WithRequestID(key string) *Middleware {
 // WithSecurity is a middleware function that enhance security
 func (m *Middleware) WithSecurity() *Middleware {
 	m.ginEngine.Use(Secure())
+	return m
+}
+
+// WithMetrics is a middleware function that enables metrics
+func (m *Middleware) WithMetrics() *Middleware {
+	// promhttp.Handler()
+	// add http handler to gin
+	m.ginEngine.GET("/metrics", gin.WrapH(promhttp.Handler()))
+	m.ginEngine.Use(Metrics())
 	return m
 }
