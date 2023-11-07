@@ -9,7 +9,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	hh "github.com/patsnapops/http-headers"
+	hh "github.com/xops-infra/http-headers"
 	"github.com/spf13/cast"
 )
 

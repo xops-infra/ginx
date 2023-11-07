@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/patsnapops/http-headers"
+	"github.com/xops-infra/http-headers"
 	"net/http"
 	"time"
 )

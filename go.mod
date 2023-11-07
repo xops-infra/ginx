@@ -1,4 +1,4 @@
-module github.com/patsnapops/ginx
+module github.com/xops-infra/ginx
 
 go 1.19
 
@@ -7,7 +7,7 @@ require (
 	github.com/gin-contrib/gzip v0.0.6
 	github.com/gin-gonic/gin v1.8.2
 	github.com/google/uuid v1.3.0
-	github.com/patsnapops/http-headers v0.0.0-20230213021202-2b827f3526a0
+	github.com/xops-infra/http-headers v0.0.0-20230213021202-2b827f3526a0
 	github.com/prometheus/client_golang v1.16.0
 	github.com/spf13/cast v1.5.1
 )
