@@ -44,7 +44,9 @@ func TokenAuthMiddleware(ignorePaths []string, secret []byte) gin.HandlerFunc {
 			return
 		}
 		username := getTokenUser(claims)
-		c.Set("username", username)
+		if username != "" {
+			c.Set("username", username)
+		}
 		c.Next()
 	}
 }
