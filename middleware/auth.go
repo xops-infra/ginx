@@ -9,8 +9,8 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	hh "github.com/xops-infra/http-headers"
 	"github.com/spf13/cast"
+	hh "github.com/xops-infra/http-headers"
 )
 
 // TokenAuthMiddleware is a middleware function that checks for a valid token in the Authorization header
@@ -43,6 +43,8 @@ func TokenAuthMiddleware(ignorePaths []string, secret []byte) gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, err.Error())
 			return
 		}
+		username := getTokenUser(claims)
+		c.Set("username", username)
 		c.Next()
 	}
 }
@@ -68,6 +70,20 @@ func checkIfExpired(claims map[string]any) error {
 		return errors.New("token expired")
 	}
 	return nil
+}
+
+// 需要在做token的时候加入username
+func getTokenUser(claims map[string]any) string {
+	const Sub = "username"
+	sub := claims[Sub]
+	if sub == nil {
+		return ""
+	}
+	subStr, ok := sub.(string)
+	if !ok {
+		return ""
+	}
+	return subStr
 }
 
 // parse use HMAC to decrypt the token
