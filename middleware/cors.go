@@ -1,9 +1,10 @@
 package middleware
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/xops-infra/http-headers"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
+	hh "github.com/xops-infra/http-headers"
 )
 
 const SEP = ", "
@@ -15,6 +16,7 @@ func CORS() gin.HandlerFunc {
 		c.Writer.Header().Set(hh.AccessControlMaxAge, "86400")
 		c.Writer.Header().Set(hh.AccessControlAllowMethods,
 			http.MethodConnect+SEP+
+				http.MethodPatch+SEP+
 				http.MethodDelete+SEP+
 				http.MethodGet+SEP+
 				http.MethodHead+SEP+
